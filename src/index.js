@@ -17,27 +17,41 @@ class Link
     let this_ = this.this__;
   }
 
-  /*点击时跳转*/
+  /*
+  点击时跳转
+  link里没有 / 则是以name跳转并使用的是params传参
+  */
   to(link,data)
   {
     let this_ = this.this__;
-    if(link){
-      let data_ = {};
-      if(data){
-        data_['query'] = data;
-      }
-      if(link.indexOf('/') != -1){//链接地址
-        data_['path'] = link;
-      }else{
-        data_['name'] = link;
-      }
-      this_.$router.push(data_);
+    let number = parseInt(link);
+    if(number){
+      this_.$router.go(number); //返回
     }else{
-      location.reload(true);
+      if(link){
+        let data_ = {};
+        if(link.indexOf('/') != -1){//链接地址
+          data_['path'] = link;
+          if(data){
+            data_['query'] = data;
+          }
+        }else{
+          data_['name'] = link;
+          if(data){
+            data_['params'] = data;
+          }
+        }
+        this_.$router.push(data_);
+      }else{//刷新
+        location.reload(true);
+      }
     }
   }
 
-  /*获取链接里传递的参数*/
+  /*
+  获取链接里传递的参数
+  接收params参数时key应该为:key，params的key在路由层定义的
+  */
   get(key)
   {
     let get = decodeURIComponent(window.location.search).replace(/\?\?/i,'?');
@@ -56,7 +70,12 @@ class Link
     }
     Object.assign(data1,this_.$route.query);
     if(key){
-      return data1[key];
+      let result = /^:/;
+      if(result.test(key)){
+        return this_.$route.params[key.replace(result,'')];
+      }else{
+        return data1[key];
+      }
     }else{
       return data1;
     }
