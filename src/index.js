@@ -23,29 +23,30 @@ class Link
   */
   to(link,data)
   {
-    let this_ = this.this__;
-    let number = parseInt(link);
-    if(number){
-      this_.$router.go(number); //返回
+    let this_=this.this__;
+    let number = link?parseInt(link):0;
+    if(number||number==0){
+      window.history.go(number);
+      //this_.$router.go(number);
     }else{
-      if(link){
-        let data_ = {};
-        if(link.indexOf('/') != -1){//链接地址
-          data_['path'] = link;
-          if(data){
-            data_['query'] = data;
-          }
-        }else{
-          data_['name'] = link;
-          if(data){
-            data_['params'] = data;
-          }
+      let data_ = {};
+      if(link.indexOf('/') != -1){//链接地址
+        data_['path'] = link;
+        if(data){
+          data_['query'] = data;
         }
-        this_.$router.push(data_);
-      }else{//刷新
-        location.reload(true);
+      }else{
+        data_['name'] = link;
+        if(data){
+          data_['params'] = data;
+        }
       }
+      this_.$router.push(data_);
     }
+  }
+
+  set()
+  {
   }
 
   /*
@@ -68,16 +69,24 @@ class Link
         }
       }
     }
-    Object.assign(data1,this_.$route.query);
-    if(key){
-      let result = /^:/;
-      if(result.test(key)){
-        return this_.$route.params[key.replace(result,'')];
+    if(this_){
+      Object.assign(data1,this_.$route.query);
+      if(key){
+        let result = /^:/;
+        if(result.test(key)){
+          return this_.$route.params[key.replace(result,'')];
+        }else{
+          return data1[key];
+        }
       }else{
-        return data1[key];
+        return data1;
       }
     }else{
-      return data1;
+      if(key){
+        return data1[key];
+      }else{
+        return data1;
+      }
     }
   }
 }
